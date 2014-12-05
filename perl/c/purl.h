@@ -2,7 +2,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "purl.c"
-
 XS(PurlXS);
-static void RunPurl();
+static char* EvalPerl();
+
+#include "purl.c"
