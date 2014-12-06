@@ -3,4 +3,5 @@ go:
  - 1.2
  - 1.3
  - tip
+before_script: export GOPATH=$HOME/gopath
 script: make
