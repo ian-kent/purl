@@ -5,7 +5,8 @@ fmt:
 
 build: deps
 	cp -f perl/perl.go perl/perl._go
-	sed -i '' 's|$$GOPATH|${GOPATH}/src|g' perl/perl.go
+	sed -i.bak 's|$$GOPATH|${GOPATH}/src|g' perl/perl.go
+	rm perl/perl.go.bak
 	#FIXME errors ignored so perl.go is restored
 	-go build .
 	mv -f perl/perl._go perl/perl.go
