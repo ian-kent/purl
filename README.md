@@ -3,6 +3,8 @@ purl
 
 Perl, but fluffy like a cat!
 
+Thanks to [Campher](https://github.com/bradfitz/campher) for some pointers in the right direction!
+
 ### Building purl
 
 Needs an absolute path workaround:

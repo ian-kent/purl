@@ -5,21 +5,57 @@ static int dummy_argc = 3;
 static char** dummy_argv;
 static char** dummy_env;
 
-extern void GoPurl();
+typedef void (*purlXSCallback) ();
 
-XS(XS_Purl)
+extern void PurlTest();
+extern SV* PurlXSHook();
+
+XS(XSTest)
 {
   dXSARGS;
   PERL_UNUSED_VAR(cv);
-  GoPurl();
+  PurlTest();
   XSRETURN_EMPTY;
+}
+
+XS(XSInvoke)
+{
+  dXSARGS;
+
+  if (items < 2) {
+    croak("expected invocant and delegate");
+  }
+
+  int n_perl_args = items - 2;
+  SV** perl_args = malloc(sizeof(SV*) * n_perl_args);
+
+  int i;
+  for (i = 0; i < n_perl_args; i++) {
+    perl_args[i] = ST(i+2);
+    SvREFCNT_inc(perl_args[i]);
+  }
+
+  SV* scalar_return = 0;
+  printf("%s\n", SvPV_nolen(ST(1)));
+  scalar_return = PurlXSHook(ST(0), SvPV_nolen(ST(1)), n_perl_args, perl_args);
+
+  free(perl_args);
+
+  if (!scalar_return) {
+    ST(0) = &PL_sv_undef;
+  } else {
+    ST(0) = sv_2mortal(scalar_return);
+  }
+
+  XSRETURN(1);
 }
 
 EXTERN_C void
 xs_init(pTHX)
 {
   char *file = __FILE__;
-  newXS("Purl::Test", XS_Purl, file);
+  newXS("Purl::Test", XSTest, file);
+  newXS("Purl::XS::Invoke", XSInvoke, file);
 }
 
 static void

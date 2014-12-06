@@ -9,7 +9,7 @@ import (
 func main() {
 	purl := &perl.Purl{}
 	purl.Init()
-	//defer purl.Destroy()
+	defer purl.Destroy()
 
 	fmt.Println("Purl::Test =>", purl.Eval(`Purl::Test()`))
 	fmt.Println("Assign expr =>", purl.Eval(`$a = "foo"`))
@@ -23,4 +23,11 @@ sub test {
 }
 `)
 	fmt.Println("Invoke =>", purl.Eval(`test("foo", "bar")`))
+
+	purl.RegisterXS("Purl::Go::Test", func(args ...string) string {
+		fmt.Println("In Purl::Go::Test XS function!")
+		return "hi!"
+	})
+	fmt.Println("Invoke custom XS =>", purl.Eval(`Purl::Go->Test()`))
+	fmt.Println("Invoke custom XS =>", purl.Eval(`Purl::Go->Test()`))
 }
