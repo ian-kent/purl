@@ -6,12 +6,23 @@ fmt:
 build: deps
 	go build .
 
-work: deps
-	go build -work .
+deps: libperl
 
-deps:
+libperl: vendor/perl-5.20.1/perl
+
+vendor/perl-5.20.1/perl: vendor/perl-5.20.1/Makefile
+	cd vendor/perl-5.20.1; make
+
+vendor/perl-5.20.1/Makefile: |vendor/perl-5.20.1
+	cd vendor/perl-5.20.1; sh ./Configure -de
+
+vendor/perl-5.20.1: vendor/perl-5.20.1.tar.gz
+	cd vendor; tar -xf perl-5.20.1.tar.gz
+
+vendor/perl-5.20.1.tar.gz: |vendor
+	wget -O vendor/perl-5.20.1.tar.gz http://www.cpan.org/src/5.0/perl-5.20.1.tar.gz
+
+vendor:
 	mkdir -p vendor
-	if [ ! -e vendor/perl-5.20.1.tar.gz ]; then wget -O vendor/perl-5.20.1.tar.gz http://www.cpan.org/src/5.0/perl-5.20.1.tar.gz; fi
-	if [ ! -e vendor/perl-5.20.1 ]; then cd vendor; tar -xf perl-5.20.1.tar.gz; cd perl-5.20.1; sh ./Configure -de; make; fi
 
-.PHONY: all fmt build work deps
+.PHONY: all fmt build deps libperl
