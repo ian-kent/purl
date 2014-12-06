@@ -4,7 +4,11 @@ fmt:
 	go fmt ./...
 
 build: deps
-	go build .
+	cp -f perl/perl.go perl/perl._go
+	sed -i '' 's|$$GOPATH|${GOPATH}/src|g' perl/perl.go
+	#FIXME errors ignored so perl.go is restored
+	-go build .
+	mv -f perl/perl._go perl/perl.go
 
 deps: libperl
 
