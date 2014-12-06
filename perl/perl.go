@@ -14,11 +14,16 @@ import (
 var perlMutex sync.Mutex
 var xsMap = make(map[string]*func(...string) string)
 
+// Purl is a Perl interpreter instance.
+//
+// You must call Init before calling any other functions.
+// You must call Destroy when finished with the instance.
 type Purl struct {
 	init    bool
 	destroy bool
 }
 
+// Init initialises the Perl interpreter instance
 func (p *Purl) Init() {
 	perlMutex.Lock()
 	if !p.init {
@@ -29,6 +34,7 @@ func (p *Purl) Init() {
 	perlMutex.Unlock()
 }
 
+// Destroy destroys the Perl interpreter instance
 func (p *Purl) Destroy() {
 	perlMutex.Lock()
 	if !p.destroy {
@@ -39,6 +45,11 @@ func (p *Purl) Destroy() {
 	perlMutex.Unlock()
 }
 
+// RegisterXS makes a Go function available in Perl
+// via an XS callback.
+//
+// It currently only supports a variadic string input
+// and a single scalar string output.
 func (p *Purl) RegisterXS(name string, f func(...string) string) {
 	cs := C.CString(name)
 	defer C.free(unsafe.Pointer(cs))
@@ -51,6 +62,9 @@ package main {
 `)
 }
 
+// Eval evaluates Perl code.
+//
+// Interpreter state is persisted until Destroy is called.
 func (p *Purl) Eval(src string) string {
 	csrc := C.CString(src)
 	defer C.free(unsafe.Pointer(csrc))
