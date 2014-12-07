@@ -1,7 +1,7 @@
 package perl
 
 /*
-#cgo CFLAGS: -D_THREAD_SAFE -pthread -I../vendor/perl-5.20.1 -I/usr/local/include
+#cgo CFLAGS: -D_THREAD_SAFE -pthread -I../vendor/perl-5.20.1 -L/usr/local/lib -I/usr/local/include
 #cgo LDFLAGS: -fstack-protector -L/usr/local/lib -L$GOPATH/github.com/ian-kent/purl/vendor/perl-5.20.1 -lperl -ldl -lm -lutil -lc -fno-common -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include
 #include "c/purl.h"
 */
