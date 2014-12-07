@@ -1,8 +1,8 @@
 package perl
 
 /*
-#cgo CFLAGS: -D_THREAD_SAFE -pthread -I../vendor/perl-5.20.1
-#cgo LDFLAGS: -fstack-protector -L/usr/local/lib -L$GOPATH/github.com/ian-kent/purl/vendor/perl-5.20.1 -lperl -ldl -lm -lutil -lc -fno-common -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include -I/usr/local/lib/perl5/5.20.1/darwin-2level/CORE
+#cgo CFLAGS: -D_THREAD_SAFE -pthread -I../vendor/perl-5.20.1 -L/usr/local/lib
+#cgo LDFLAGS: -fstack-protector -L/usr/local/lib -L$GOPATH/github.com/ian-kent/purl/vendor/perl-5.20.1 -lperl -ldl -lm -lutil -lc -fno-common -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include
 #include "c/purl.h"
 */
 import "C"
@@ -51,9 +51,6 @@ func (p *Purl) Destroy() {
 // It currently only supports a variadic string input
 // and a single scalar string output.
 func (p *Purl) RegisterXS(name string, f func(...string) string) {
-	cs := C.CString(name)
-	defer C.free(unsafe.Pointer(cs))
-
 	xsMap[name] = &f
 	p.Eval(`
 package main {
