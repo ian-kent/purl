@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/ian-kent/purl/perl"
 )
@@ -30,4 +31,14 @@ sub test {
 	})
 	fmt.Println("Invoke custom XS =>", purl.Eval(`Purl::Go->Test()`))
 	fmt.Println("Invoke custom XS =>", purl.Eval(`Purl::Go->Test()`))
+
+	purl.RegisterXS("Purl::Go::Test2", func(args ...string) string {
+		fmt.Println("In Purl::Go::Test2 XS function!")
+		for i, v := range args {
+			fmt.Printf(" %d: %s\n", i, v)
+		}
+		return strconv.Itoa(len(args))
+	})
+	fmt.Println("Invoke custom XS =>", purl.Eval(`Purl::Go->Test2()`))
+	fmt.Println("Invoke custom XS =>", purl.Eval(`Purl::Go->Test2("foo", "bar")`))
 }

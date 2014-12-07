@@ -2,7 +2,7 @@ package perl
 
 /*
 #cgo CFLAGS: -D_THREAD_SAFE -pthread -I../vendor/perl-5.20.1 -L/usr/local/lib -I/usr/local/include
-#cgo LDFLAGS: -fstack-protector -L/usr/local/lib -L$GOPATH/github.com/ian-kent/purl/vendor/perl-5.20.1 -lperl -ldl -lm -lutil -lc -fno-common -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include
+#cgo LDFLAGS: -fstack-protector -L/usr/local/lib -L/Users/ikent/dev/src/github.com/ian-kent/purl/vendor/perl-5.20.1 -lperl -ldl -lm -lutil -lc -fno-common -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include
 #include "c/purl.h"
 */
 import "C"
@@ -13,6 +13,9 @@ import (
 
 var perlMutex sync.Mutex
 var xsMap = make(map[string]*func(...string) string)
+
+var dummySVPtr *C.SV
+var svPtrSize = unsafe.Sizeof(dummySVPtr)
 
 // Purl is a Perl interpreter instance.
 //
@@ -54,7 +57,7 @@ func (p *Purl) RegisterXS(name string, f func(...string) string) {
 	xsMap[name] = &f
 	p.Eval(`
 package main {
-	*{"` + name + `"} = sub { Purl::XS->Invoke("` + name + `") };
+	*{"` + name + `"} = sub { Purl::XS->Invoke("` + name + `", @_) };
 }
 `)
 }
@@ -81,4 +84,16 @@ func newString(s string) *C.SV {
 	defer C.free(unsafe.Pointer(cs))
 	str := C.Perl_newSVpvn(cs, C.STRLEN(len(s)))
 	return str
+}
+
+func getArgs(narg C.int, svArgsPtr unsafe.Pointer) []string {
+	cbargs := make([]string, narg)
+
+	for i := 0; i < int(narg); i++ {
+		csv := *((**C.SV)(unsafe.Pointer(uintptr(svArgsPtr) + uintptr(uintptr(i)*svPtrSize))))
+		cs := C.GetSVString(csv)
+		cbargs[i] = C.GoString(cs)
+	}
+
+	return cbargs
 }

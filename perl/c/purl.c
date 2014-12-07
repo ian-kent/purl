@@ -87,7 +87,14 @@ PurlDestroy()
 }
 
 static char*
-EvalPerl(char *src) {
+GetSVString(SV *sv)
+{
+  return SvPV_nolen(sv);
+}
+
+static char*
+EvalPerl(char *src)
+{
   char* pv;
 
   SV *val = eval_pv(src, TRUE);

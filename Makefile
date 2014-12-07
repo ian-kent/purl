@@ -11,6 +11,14 @@ build: deps
 	-go build .
 	mv -f perl/perl._go perl/perl.go
 
+test: deps
+	cp -f perl/perl.go perl/perl._go
+	sed -i.bak 's|$$GOPATH|${GOPATH}/src|g' perl/perl.go
+	rm perl/perl.go.bak
+	#FIXME errors ignored so perl.go is restored
+	go test ./...
+	mv -f perl/perl._go perl/perl.go
+
 deps: libperl
 
 libperl: vendor/perl-5.20.1/perl
@@ -30,4 +38,4 @@ vendor/perl-5.20.1.tar.gz: |vendor
 vendor:
 	mkdir -p vendor
 
-.PHONY: all fmt build deps libperl
+.PHONY: all fmt test build deps libperl devmode devmode.off

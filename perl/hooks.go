@@ -16,7 +16,8 @@ func PurlXSHook(fnAddr unsafe.Pointer, delegate *C.char, narg C.int, svArgsPtr u
 	dn := C.GoString(delegate)
 	if d, ok := xsMap[dn]; ok {
 		df := *d
-		sv := newString(df())
+		cbargs := getArgs(narg, svArgsPtr)
+		sv := newString(df(cbargs...))
 		svOutResult = unsafe.Pointer(sv)
 	} else {
 		panic("Unknown XS hook")
